@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur de nuée</title>
+    <style>
+        canvas {
+            background-color: #000;
+			display: flex;
+			width: 100vw;
+			height: 100vh;
+        }
+		body {
+			margin: 0;
+			display: flex;
+			width: 100vw;
+			height: 100vh;
+			overflow: hidden;
+			font-family: 'Arial', sans-serif;
+			font-size: 14px;
+			color: #fff;
+            background-color: #000;
+		}
+		
+		#controls-toggle {
+			position: fixed;
+			top: 10px;
+			right: 10px;
+			background: #333;
+			color: #fff;
+			border-radius: 5px;
+			padding: 10px;
+			cursor: pointer;
+			z-index: 1000;
+			opacity: 0.80;
+		}
+
+		#controls-window {
+			position: fixed;
+			top: 10px;
+			right: 60px;
+			background: rgba(0, 0, 0, 0.8);
+			color: #fff;
+			padding: 20px;
+			border-radius: 10px;
+			display: none;
+			z-index: 1000;
+		}
+
+		#controls-window label {
+			display: block;
+			margin: 10px 0 5px;
+		}
+
+		#controls-window input[type="range"] {
+			width: 100%;
+		}
+
+		#controls-window h2 {
+			margin-top: 0;
+		}
+    </style>
+</head>
+<body>
+    <canvas id="birdsCanvas"></canvas>
+
+	<div id="controls-toggle">⚙️</div>
+	<div id="controls-window">
+		<h2>Paramètres</h2>
+		<label>Nombre d'oiseaux: <span id="num-birds-label"></span></label>
+		<input type="range" id="num-birds" min="1" max="500" value="100">
+		
+		<label>Vitesse maximale: <span id="max-speed-label"></span></label>
+		<input type="range" id="max-speed" min="0" max="10" step="0.1" value="3">
+		
+		<label>Force maximale: <span id="max-force-label"></span></label>
+		<input type="range" id="max-force" min="0" max="1" step="0.01" value="0.05">
+		
+		<label>Rayon de vision: <span id="vision-radius-label"></span></label>
+		<input type="range" id="vision-radius" min="0" max="100" value="40">
+		
+		<label>Rayon d'évitement: <span id="avoid-radius-label"></span></label>
+		<input type="range" id="avoid-radius" min="0" max="100" value="30">
+	</div>
+
+    <script src="js\script.js"></script>
+</body>
+</html>
