@@ -20,7 +20,6 @@
 			font-family: 'Arial', sans-serif;
 			font-size: 14px;
 			color: #fff;
-            background-color: #000;
 		}
 		
 		#controls-toggle {
@@ -34,6 +33,12 @@
 			cursor: pointer;
 			z-index: 1000;
 			opacity: 0.80;
+			transition: background-color 0.3s ease, transform 0.3s ease;
+		}
+
+		#controls-toggle:hover {
+			background: #444;
+			transform: scale(1.1);
 		}
 
 		#controls-window {
@@ -44,8 +49,33 @@
 			color: #fff;
 			padding: 20px;
 			border-radius: 10px;
-			display: none;
+			visibility: hidden;
+			opacity: 0;
+			transition: opacity 0.3s ease, visibility 0s 0.3s;
 			z-index: 1000;
+		}
+
+		#controls-window.show {
+			visibility: visible;
+			opacity: 1;
+			transition: opacity 0.3s ease, visibility 0s 0s;
+		}
+		
+		#controls-window,
+		#controls-toggle {
+			user-select: none;
+		}
+
+		input[type="range"] {
+			cursor: pointer;
+		}
+
+		input[type="range"]:hover {
+			cursor: ew-resize;
+		}
+
+		input[type="checkbox"] {
+			cursor: pointer;
 		}
 
 		#controls-window label {
@@ -60,6 +90,55 @@
 		#controls-window h2 {
 			margin-top: 0;
 		}
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        #wartets-link {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #ffffff;
+            background-color: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+			opacity: 0.7;
+            transition: color 0.3s ease, opacity 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        #wartets-link:hover {
+            left: 7px;
+            top: 8px;
+            color: #eee;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 15px;
+			opacity: 1;
+            transition: color 0.3s ease, opacity 0.1s ease, text-decoration 0.3s ease;
+        }
+
+        #my-button {
+            background-color: none;
+            color: #222;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        #my-button:hover {
+            text-decoration: underline;
+            cursor: pointer;
+            transition: text-decoration 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +161,20 @@
 		
 		<label>Rayon d'évitement: <span id="avoid-radius-label"></span></label>
 		<input type="range" id="avoid-radius" min="0" max="100" value="30">
+		
+		<label>Seuil de Fatigue: <span id="max-fatigue-label"></span></label>
+		<input type="range" id="max-fatigue" min="0" max="20" step="0.1" value="6">
+		
+		<label>Facteur d'inattention: <span id="misconduct-label"></span></label>
+		<input type="range" id="misconduct" min="0" max="10" step="0.1" value="1">
+		
+        <div class="checkbox-container">
+            <input type="checkbox" id="color-cohesion-checkbox" />
+            <label for="color-cohesion-checkbox">Cohésion colorimétrique</label>
+        </div>
 	</div>
+
+	<a href="https://github.com/wartets/Bird-cloud/" target="_blank" id="wartets-link">@Wartets</a>
 
     <script src="js\script.js"></script>
 </body>

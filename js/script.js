@@ -10,6 +10,9 @@ let MAX_SPEED = 3;
 let MAX_FORCE = 0.05;
 let VISION_RADIUS = 40;
 let AVOID_RADIUS = 30;
+let bird_color = false;
+let MAX_FATIGUE = 6;
+let MISCONDUCT = 1;
 
 const controlsToggle = document.getElementById('controls-toggle');
 const controlsWindow = document.getElementById('controls-window');
@@ -18,15 +21,89 @@ const maxSpeedSlider = document.getElementById('max-speed');
 const maxForceSlider = document.getElementById('max-force');
 const visionRadiusSlider = document.getElementById('vision-radius');
 const avoidRadiusSlider = document.getElementById('avoid-radius');
+const maxFatigueSlider = document.getElementById('max-fatigue');
+const misconductSlider = document.getElementById('misconduct');
 
 const numBirdsLabel = document.getElementById('num-birds-label');
 const maxSpeedLabel = document.getElementById('max-speed-label');
 const maxForceLabel = document.getElementById('max-force-label');
 const visionRadiusLabel = document.getElementById('vision-radius-label');
 const avoidRadiusLabel = document.getElementById('avoid-radius-label');
+const maxFatigueLabel = document.getElementById('max-fatigue-label');
+const misconductLabel = document.getElementById('misconduct-label');
+
+const colorCohesionCheckbox = document.getElementById('color-cohesion-checkbox');
+colorCohesionCheckbox.addEventListener('change', () => {
+    bird_color = colorCohesionCheckbox.checked;
+});
+
+let canClick = true;
+
+canvas.addEventListener('click', (event) => {
+	if (!canClick) return;  // Empêche de cliquer trop rapidement
+
+	canClick = false;
+	setTimeout(() => canClick = true, 500);
+    const x = event.clientX;
+    const y = event.clientY;
+
+    // Vérifier quel oiseau est cliqué
+    let birdClicked = null;
+    for (let bird of birds) {
+        if (dist({x, y}, bird.position) < bird.size * 2) {  // Vérifier si on clique dans la zone de l'oiseau
+            birdClicked = bird;
+            break;
+        }
+    }
+
+    if (birdClicked) {
+        // Si un oiseau est sélectionné
+        if (currentBird === birdClicked) {
+            // Si on clique à nouveau sur le même oiseau, effacer le tracé
+            birdPaths[birdClicked.color] = [];
+            currentBird = null;
+        } else {
+            // Si un autre oiseau est sélectionné, effacer l'ancien tracé et démarrer un nouveau tracé
+            if (currentBird) {
+                birdPaths[currentBird.color] = [];
+            }
+            currentBird = birdClicked;
+            birdPaths[currentBird.color] = [{ x: currentBird.position.x, y: currentBird.position.y }];
+        }
+    } else {
+        // Si aucun oiseau n'est cliqué, effacer l'ancien tracé
+        if (currentBird) {
+            birdPaths[currentBird.color] = [];
+            currentBird = null;
+        }
+    }
+});
 
 controlsToggle.addEventListener('click', () => {
-    controlsWindow.style.display = controlsWindow.style.display === 'none' ? 'block' : 'none';
+    controlsWindow.classList.toggle('show');
+});
+
+let cursorHidden = false;
+let inactivityTimeout;  // Référence pour le timer d'inactivité
+
+// Fonction pour cacher le curseur
+function hideCursor() {
+    document.body.style.cursor = 'none';  // Cacher le curseur
+    cursorHidden = true;
+}
+
+// Fonction pour afficher le curseur
+function showCursor() {
+    document.body.style.cursor = 'auto';  // Afficher le curseur
+    cursorHidden = false;
+}
+
+canvas.addEventListener('mousemove', () => {
+    if (cursorHidden) {
+        showCursor();  // Réafficher le curseur si il était caché
+    }
+    clearTimeout(inactivityTimeout);  // Réinitialiser le timer d'inactivité
+    inactivityTimeout = setTimeout(hideCursor, 3900);  // Redémarrer le compte à rebours de 5 secondes
 });
 
 numBirdsLabel.innerText = NUM_BIRDS;
@@ -34,6 +111,8 @@ maxSpeedLabel.innerText = MAX_SPEED;
 maxForceLabel.innerText = MAX_FORCE;
 visionRadiusLabel.innerText = VISION_RADIUS;
 avoidRadiusLabel.innerText = AVOID_RADIUS;
+maxFatigueLabel.innerText = MAX_FATIGUE;
+misconductLabel.innerText = MISCONDUCT;
 
 numBirdsSlider.addEventListener('input', () => {
     const newNum = parseInt(numBirdsSlider.value, 10);
@@ -51,7 +130,7 @@ numBirdsSlider.addEventListener('input', () => {
 
 maxSpeedSlider.addEventListener('input', () => {
     MAX_SPEED = parseFloat(maxSpeedSlider.value);
-    maxSpeedLabel.innerText = MAX_SPEED.toFixed(2);
+    maxSpeedLabel.innerText = MAX_SPEED.toFixed(1);
 });
 
 maxForceSlider.addEventListener('input', () => {
@@ -69,7 +148,19 @@ avoidRadiusSlider.addEventListener('input', () => {
     avoidRadiusLabel.innerText = AVOID_RADIUS;
 });
 
+maxFatigueSlider.addEventListener('input', () => {
+    MAX_FATIGUE = parseFloat(maxFatigueSlider.value);
+    maxFatigueLabel.innerText = MAX_FATIGUE.toFixed(1);
+});
+
+misconductSlider.addEventListener('input', () => {
+    MISCONDUCT = parseFloat(misconductSlider.value);
+    misconductLabel.innerText = MISCONDUCT.toFixed(2);
+});
+
 let birds = [];
+let birdPaths = {};
+let currentBird = null;
 
 // Classe Bird
 class Bird {
@@ -78,9 +169,19 @@ class Bird {
         this.velocity = { x: - Math.random() * 2 - 1, y: Math.random() * 2 - 1 };
         this.acceleration = { x: 0, y: 0 };
 		this.fatigue = 0;
-		this.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+		if (bird_color) {
+			this.color = '#' + Math.floor(Math.random() * 16777215 / 2.5).toString(16)
+		}
+		else {
+			this.color = '#' + Math.floor(Math.random() * 16777215).toString(16)
+		}
 		this.size = 4.5 - 0.8 * Math.random()
 		this.strayChance = Math.random() * 0.01 * (this.size / 4.5)
+    }
+	
+    sameColorBirds(birds) {
+		const threshold = 50;  // Seuil de distance pour considérer les couleurs comme similaires
+		return birds.filter(bird => colorDistance(this.color, bird.color) < threshold);
     }
 
     applyForce(force) {
@@ -94,7 +195,12 @@ class Bird {
         this.velocity.y += this.acceleration.y;
 
         // Limiter la vitesse
-        this.velocity = limit(this.velocity, MAX_SPEED);
+		if (bird_color) {
+			this.velocity = limit(this.velocity, MAX_SPEED * 2);
+		}
+		else {
+			this.velocity = limit(this.velocity, MAX_SPEED);
+		}
 
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
@@ -111,7 +217,7 @@ class Bird {
 		this.fatigue += Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2) * 0.01;
 
 		// Si la fatigue dépasse un seuil, ralentir
-		if (this.fatigue > 6) {
+		if (this.fatigue > MAX_FATIGUE) {
 			this.velocity.x *= 0.95;
 			this.velocity.y *= 0.95;
 
@@ -138,59 +244,118 @@ class Bird {
         ctx.restore();
     }
 
-    // Règles de birds
-    cohesion(birds) {
-        let total = 0;
-        let center = { x: 0, y: 0 };
+     // Règles de birds
+	cohesion(birds) {
+		let total = 0;
+		let center = { x: 0, y: 0 };
 
-        for (let Bird of birds) {
-            const distance = dist(this.position, Bird.position);
-            if (Bird !== this && distance < VISION_RADIUS) {
-                center.x += Bird.position.x;
-                center.y += Bird.position.y;
-                total++;
-            }
-        }
+		if (bird_color) {
+			const sameColorBirds = this.sameColorBirds(birds);  // Filtrer par couleur
 
-		// Éloignement aléatoire
+			for (let Bird of sameColorBirds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < VISION_RADIUS) {
+					center.x += Bird.position.x;
+					center.y += Bird.position.y;
+					total++;
+				}
+			}
+		}
+		else {
+			for (let Bird of birds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < VISION_RADIUS) {
+					center.x += Bird.position.x;
+					center.y += Bird.position.y;
+					total++;
+				}
+			}
+		}
+
+		// Interaction avec les oiseaux proches des bords (à l'autre côté)
+		if (this.position.x < VISION_RADIUS) {
+			for (let Bird of birds) {
+				if (Bird !== this && Bird.position.x > canvas.width - VISION_RADIUS) {
+					const distance = dist(this.position, Bird.position);
+					if (distance < VISION_RADIUS) {
+						center.x += Bird.position.x;
+						center.y += Bird.position.y;
+						total++;
+					}
+				}
+			}
+		}
+
+		if (this.position.y < VISION_RADIUS) {
+			for (let Bird of birds) {
+				if (Bird !== this && Bird.position.y > canvas.height - VISION_RADIUS) {
+					const distance = dist(this.position, Bird.position);
+					if (distance < VISION_RADIUS) {
+						center.x += Bird.position.x;
+						center.y += Bird.position.y;
+						total++;
+					}
+				}
+			}
+		}
+
 		if (Math.random() < this.strayChance) {
 			return {
-				x: Math.random() * 4 - 1, // Mouvement aléatoire
-				y: Math.random() * 4 - 1,
+				x: (Math.random() < 0.5 ? 1 : -1) * MISCONDUCT * (Math.random() * 4 - 1), // Mouvement aléatoire
+				y: (Math.random() < 0.5 ? 1 : -1) * MISCONDUCT * (Math.random() * 4 - 1),
 			};
 		}
 
-        if (total > 0) {
-            center.x /= total;
-            center.y /= total;
-            const desired = {
-                x: center.x - this.position.x,
-                y: center.y - this.position.y,
-            };
+		if (total > 0) {
+			center.x /= total;
+			center.y /= total;
+			const desired = {
+				x: center.x - this.position.x,
+				y: center.y - this.position.y,
+			};
 			return limit({
 				x: desired.x * (1 - this.fatigue / 10),
 				y: desired.y * (1 - this.fatigue / 10),
 			}, MAX_FORCE);
-        }
-        return { x: 0, y: 0 };
-    }
+		}
+		return { x: 0, y: 0 };
+	}
+
 
     separation(birds) {
         let total = 0;
         let steer = { x: 0, y: 0 };
+        
+		if (bird_color) {		
+			const sameColorBirds = this.sameColorBirds(birds);  // Filtrer par couleur
 
-        for (let Bird of birds) {
-            const distance = dist(this.position, Bird.position);
-            if (Bird !== this && distance < AVOID_RADIUS) {
-                const diff = {
-                    x: this.position.x - Bird.position.x,
-                    y: this.position.y - Bird.position.y,
-                };
-                steer.x += diff.x / distance;
-                steer.y += diff.y / distance;
-                total++;
-            }
-        }
+			for (let Bird of sameColorBirds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < AVOID_RADIUS) {
+					const diff = {
+						x: this.position.x - Bird.position.x,
+						y: this.position.y - Bird.position.y,
+					};
+					steer.x += diff.x / distance;
+					steer.y += diff.y / distance;
+					total++;
+				}
+			}
+		}
+		else {
+			for (let Bird of birds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < AVOID_RADIUS) {
+					const diff = {
+						x: this.position.x - Bird.position.x,
+						y: this.position.y - Bird.position.y,
+					};
+					steer.x += diff.x / distance;
+					steer.y += diff.y / distance;
+					total++;
+				}
+			}
+		}
 
         if (total > 0) {
             steer.x /= total;
@@ -204,14 +369,28 @@ class Bird {
         let total = 0;
         let avgVelocity = { x: 0, y: 0 };
 
-        for (let Bird of birds) {
-            const distance = dist(this.position, Bird.position);
-            if (Bird !== this && distance < VISION_RADIUS) {
-                avgVelocity.x += Bird.velocity.x;
-                avgVelocity.y += Bird.velocity.y;
-                total++;
-            }
-        }
+		if (bird_color) {	
+			const sameColorBirds = this.sameColorBirds(birds);  // Filtrer par couleur
+
+			for (let Bird of sameColorBirds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < VISION_RADIUS) {
+					avgVelocity.x += Bird.velocity.x;
+					avgVelocity.y += Bird.velocity.y;
+					total++;
+				}
+			}
+		}
+		else {
+			for (let Bird of birds) {
+				const distance = dist(this.position, Bird.position);
+				if (Bird !== this && distance < VISION_RADIUS) {
+					avgVelocity.x += Bird.velocity.x;
+					avgVelocity.y += Bird.velocity.y;
+					total++;
+				}
+			}
+		}
 
         if (total > 0) {
             avgVelocity.x /= total;
@@ -226,7 +405,62 @@ class Bird {
     }
 }
 
+// Mettre à jour les tracés des oiseaux
+function updateBirdPaths() {
+	if (currentBird) {
+		birdPaths[currentBird.color].push({ x: currentBird.position.x, y: currentBird.position.y });
+	}
+}
+
+// Dessiner les tracés
+function drawPaths() {
+    for (let color in birdPaths) {
+        const path = birdPaths[color];
+        if (path.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(path[0].x, path[0].y);
+            for (let i = 1; i < path.length; i++) {
+                const prevPoint = path[i - 1];
+                const currentPoint = path[i];
+
+                // Détecter une téléportation
+                const dx = Math.abs(currentPoint.x - prevPoint.x);
+                const dy = Math.abs(currentPoint.y - prevPoint.y);
+                const teleported = dx > canvas.width / 2 || dy > canvas.height / 2;
+
+                if (teleported) {
+                    // Si téléportation, ne pas dessiner ce segment
+                    ctx.moveTo(currentPoint.x, currentPoint.y);
+                } else {
+                    ctx.lineTo(currentPoint.x, currentPoint.y);
+                }
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+    }
+}
+
+
 // Utilitaires
+function colorDistance(color1, color2) {
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
+    const rDiff = rgb1.r - rgb2.r;
+    const gDiff = rgb1.g - rgb2.g;
+    const bDiff = rgb1.b - rgb2.b;
+    return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+}
+
+// Fonction pour convertir un hex en RGB
+function hexToRgb(hex) {
+    let r = parseInt(hex.substr(1, 2), 16);
+    let g = parseInt(hex.substr(3, 2), 16);
+    let b = parseInt(hex.substr(5, 2), 16);
+    return { r, g, b };
+}
+
 function dist(a, b) {
     return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
@@ -248,21 +482,27 @@ for (let i = 0; i < NUM_BIRDS; i++) {
 // Boucle d'animation
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	updateBirdPaths();
+	drawPaths();
 
-    for (let Bird of birds) {
-        const cohesionForce = Bird.cohesion(birds);
-        const separationForce = Bird.separation(birds);
-        const alignmentForce = Bird.alignment(birds);
+    // Mettre à jour les oiseaux
+    for (let bird of birds) {
+        const cohesionForce = bird.cohesion(birds);
+        const separationForce = bird.separation(birds);
+        const alignmentForce = bird.alignment(birds);
 
-        Bird.applyForce(cohesionForce);
-        Bird.applyForce(separationForce);
-        Bird.applyForce(alignmentForce);
+        bird.applyForce(cohesionForce);
+        bird.applyForce(separationForce);
+        bird.applyForce(alignmentForce);
+		
 
-        Bird.update();
-        Bird.draw();
+        bird.update();
+        bird.draw();
     }
 
     requestAnimationFrame(animate);
 }
 
 animate();
+
