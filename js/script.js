@@ -83,6 +83,26 @@ controlsToggle.addEventListener('click', () => {
     controlsWindow.classList.toggle('show');
 });
 
+const readmeButton = document.getElementById('readme-toggle');
+const readmeWindow = document.getElementById('readme-window');
+
+const readmeContent = `
+	<h2>Simulation de Nuée d'Oiseaux</h2>
+	<p>Ce projet est une simulation interactive basée sur le modèle des <strong>boids</strong>, illustrant le comportement collectif des oiseaux en vol. Il est basé sur trois règles de base :</p>
+	<ul>
+		<li><strong>Cohésion :</strong> Les oiseaux se rapprochent du centre de masse des voisins.</li>
+		<li><strong>Séparation :</strong> Ils évitent les collisions avec leurs congénères.</li>
+		<li><strong>Alignement :</strong> Ils suivent la direction moyenne des voisins.</li>
+	</ul>
+`;
+
+readmeWindow.innerHTML = readmeContent;
+
+// Toggle visibility of the README window
+readmeButton.addEventListener('click', () => {
+	readmeWindow.classList.toggle('show');
+});
+
 let cursorHidden = false;
 let inactivityTimeout;  // Référence pour le timer d'inactivité
 

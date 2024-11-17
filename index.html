@@ -35,11 +35,12 @@
 			padding: 10px;
 			cursor: pointer;
 			z-index: 1000;
-			opacity: 0.80;
+			opacity: 0.5;
 			transition: background-color 0.3s ease, transform 0.3s ease;
 		}
 
 		#controls-toggle:hover {
+			opacity: 1;
 			background: #444;
 			transform: scale(1.1);
 		}
@@ -65,7 +66,9 @@
 		}
 		
 		#controls-window,
-		#controls-toggle {
+		#controls-toggle,
+		#readme-window,
+		#readme-toggle {
 			user-select: none;
 		}
 
@@ -127,21 +130,50 @@
             transition: color 0.3s ease, opacity 0.1s ease, text-decoration 0.3s ease;
         }
 
-        #my-button {
-            background-color: none;
-            color: #222;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: color 0.3s ease, text-decoration 0.3s ease;
-        }
+		#readme-toggle {
+			position: fixed;
+			bottom: 10px;
+			right: 10px;
+			background: #333;
+			color: #fff;
+			border-radius: 5px;
+			padding: 10px;
+			cursor: pointer;
+			z-index: 1000;
+			opacity: 0.5;
+			transition: background-color 0.3s ease, transform 0.3s ease;
+		}
 
-        #my-button:hover {
-            text-decoration: underline;
-            cursor: pointer;
-            transition: text-decoration 0.3s ease;
-        }
+		#readme-toggle:hover {
+			background: #444;
+			transform: scale(1.1);
+			opacity: 1;
+		}
+
+		#readme-window {
+			position: fixed;
+			bottom: 60px;
+			right: 10px;
+			background: rgba(0, 0, 0, 0.9);
+			color: #fff;
+			padding: 20px;
+			border-radius: 10px;
+			width: 400px;
+			max-height: 70vh;
+			overflow-y: auto;
+			visibility: hidden;
+			opacity: 0;
+			transition: opacity 0.3s ease, visibility 0s 0.3s;
+			z-index: 1000;
+			font-size: 14px;
+			line-height: 1.5;
+		}
+
+		#readme-window.show {
+			visibility: visible;
+			opacity: 1;
+			transition: opacity 0.3s ease, visibility 0s 0s;
+		}
     </style>
 </head>
 <body>
@@ -175,6 +207,11 @@
             <input type="checkbox" id="color-cohesion-checkbox" />
             <label for="color-cohesion-checkbox">Cohésion colorimétrique</label>
         </div>
+	</div>
+
+	<div id="readme-toggle">❓</div>
+	<div id="readme-window">
+		<!-- Le contenu du README sera inséré ici dynamiquement -->
 	</div>
 
 	<a href="https://github.com/wartets/Bird-cloud/" target="_blank" id="wartets-link">@Wartets</a>
