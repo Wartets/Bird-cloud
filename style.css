@@ -10,49 +10,63 @@ body {
 	width: 100vw;
 	height: 100vh;
 	overflow: hidden;
-	font-family: 'Arial', sans-serif;
+	font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	color: #fff;
+	-webkit-font-smoothing: antialiased;
 }
 
 #controls-toggle {
 	position: fixed;
-	top: 10px;
-	right: 10px;
-	background: #333;
+	top: 20px;
+	right: 20px;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(30, 30, 30, 0.6);
+	backdrop-filter: blur(5px);
 	color: #fff;
-	border-radius: 5px;
-	padding: 10px;
+	border-radius: 50%;
 	cursor: pointer;
 	z-index: 1000;
-	opacity: 0.5;
-	transition: background-color 0.3s ease, transform 0.3s ease;
+	transition: all 0.3s ease;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 18px;
 }
 
 #controls-toggle:hover {
-	opacity: 1;
-	background: #444;
+	background: rgba(50, 50, 50, 0.9);
 	transform: scale(1.1);
+	box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
 #controls-window {
 	position: fixed;
-	top: 10px;
-	right: 60px;
-	background: rgba(0, 0, 0, 0.8);
-	color: #fff;
-	padding: 20px;
-	border-radius: 10px;
+	top: 70px;
+	right: 20px;
+	width: 280px;
+	background: rgba(20, 20, 20, 0.75);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+	color: #eee;
+	padding: 25px;
+	border-radius: 15px;
 	visibility: hidden;
 	opacity: 0;
-	transition: opacity 0.3s ease, visibility 0s 0.3s;
+	transform: translateY(-10px);
+	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
 	z-index: 1000;
 }
 
 #controls-window.show {
 	visibility: visible;
 	opacity: 1;
-	transition: opacity 0.3s ease, visibility 0s 0s;
+	transform: translateY(0);
+	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0s;
 }
 
 #controls-window,
@@ -60,18 +74,6 @@ body {
 #readme-window,
 #readme-toggle {
 	user-select: none;
-}
-
-input[type="range"] {
-	cursor: pointer;
-}
-
-input[type="range"]:hover {
-	cursor: ew-resize;
-}
-
-input[type="checkbox"] {
-	cursor: pointer;
 }
 
 #controls-window label {
@@ -98,69 +100,161 @@ input[type="checkbox"] {
 
 #wartets-link {
 	position: fixed;
-	top: 10px;
-	left: 10px;
-	color: #ffffff;
-	background-color: none;
-	padding: 10px;
-	border-radius: 5px;
-	font-size: 14px;
-	opacity: 0.7;
-	transition: color 0.3s ease, opacity 0.3s ease, text-decoration 0.3s ease;
+	top: 20px;
+	left: 20px;
+	color: rgba(255, 255, 255, 0.6);
+	text-decoration: none;
+	padding: 8px 15px;
+	background: rgba(30, 30, 30, 0.4);
+	backdrop-filter: blur(4px);
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #wartets-link:hover {
-	left: 7px;
-	top: 8px;
-	color: #eee;
-	text-decoration: underline;
-	cursor: pointer;
-	font-size: 15px;
+	left: 20px;
+	top: 20px;
+	color: #fff;
+	background: rgba(50, 50, 50, 0.8);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+	text-decoration: none;
 	opacity: 1;
-	transition: color 0.3s ease, opacity 0.1s ease, text-decoration 0.3s ease;
 }
 
 #readme-toggle {
 	position: fixed;
-	bottom: 10px;
-	right: 10px;
-	background: #333;
+	bottom: 20px;
+	right: 20px;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(30, 30, 30, 0.6);
+	backdrop-filter: blur(5px);
 	color: #fff;
-	border-radius: 5px;
-	padding: 10px;
+	border-radius: 50%;
 	cursor: pointer;
 	z-index: 1000;
-	opacity: 0.5;
-	transition: background-color 0.3s ease, transform 0.3s ease;
+	transition: all 0.3s ease;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 18px;
 }
 
 #readme-toggle:hover {
-	background: #444;
+	background: rgba(50, 50, 50, 0.9);
 	transform: scale(1.1);
+	box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 	opacity: 1;
 }
 
 #readme-window {
 	position: fixed;
-	bottom: 60px;
-	right: 10px;
-	background: rgba(0, 0, 0, 0.9);
-	color: #fff;
-	padding: 20px;
-	border-radius: 10px;
-	width: 400px;
-	max-height: 70vh;
+	bottom: 70px;
+	right: 20px;
+	background: rgba(20, 20, 20, 0.85);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	color: #ddd;
+	padding: 25px;
+	border-radius: 15px;
+	width: 350px;
+	max-height: 60vh;
 	overflow-y: auto;
 	visibility: hidden;
 	opacity: 0;
-	transition: opacity 0.3s ease, visibility 0s 0.3s;
+	transform: translateY(10px);
+	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
 	z-index: 1000;
 	font-size: 14px;
-	line-height: 1.5;
+	line-height: 1.6;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 #readme-window.show {
 	visibility: visible;
 	opacity: 1;
-	transition: opacity 0.3s ease, visibility 0s 0s;
+	transform: translateY(0);
+	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0s;
+}
+
+#readme-window::-webkit-scrollbar {
+	width: 6px;
+}
+#readme-window::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.05);
+}
+#readme-window::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 3px;
+}
+
+input[type=range] {
+	-webkit-appearance: none;
+	width: 100%;
+	background: transparent;
+	margin: 10px 0;
+}
+
+input[type=range]:focus {
+	outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+	width: 100%;
+	height: 4px;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+	transition: background 0.2s;
+}
+input[type=range]:hover::-webkit-slider-runnable-track {
+	background: rgba(255, 255, 255, 0.3);
+}
+input[type=range]::-moz-range-track {
+	width: 100%;
+	height: 4px;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+	height: 16px;
+	width: 16px;
+	border-radius: 50%;
+	background: #fff;
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: -6px;
+	box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+input[type=range]::-moz-range-thumb {
+	height: 16px;
+	width: 16px;
+	border: none;
+	border-radius: 50%;
+	background: #fff;
+	cursor: pointer;
+	box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+#readme-window h3 {
+	margin-top: 0;
+	color: #fff;
+	border-bottom: 1px solid rgba(255,255,255,0.1);
+	padding-bottom: 10px;
+}
+#readme-window h4 {
+	margin: 15px 0 5px;
+	color: #fff;
+}
+#readme-window ul {
+	padding-left: 20px;
+	margin: 5px 0;
 }

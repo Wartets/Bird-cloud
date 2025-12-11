@@ -16,7 +16,7 @@
 	<meta property="og:image" content="https://wartets.github.io/Wartets/img/BirdCloud-card.png">
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="https://wartets.github.io/Bird-cloud/">
-	<title>Simulateur de nuée</title>
+	<title>Bird cloud</title>
 
 	<link rel="icon" href="https://wartets.github.io/N-Body-Problem/image/browser-icon.png">
 
@@ -27,39 +27,52 @@
 
 	<div id="controls-toggle">⚙️</div>
 	<div id="controls-window">
-		<h2>Paramètres</h2>
-		<label>Nombre d'oiseaux: <span id="num-birds-label"></span></label>
+		<h2>Settings</h2>
+		<label>Bird Count: <span id="num-birds-label"></span></label>
 		<input type="range" id="num-birds" min="1" max="5000" value="300">
 		
-		<label>Vitesse maximale: <span id="max-speed-label"></span></label>
-		<input type="range" id="max-speed" min="0" max="10" step="0.1" value="3">
+		<label>Max Speed: <span id="max-speed-label"></span></label>
+		<input type="range" id="max-speed" min="0" max="100" step="0.1" value="3">
 		
-		<label>Force maximale: <span id="max-force-label"></span></label>
-		<input type="range" id="max-force" min="0" max="1" step="0.01" value="0.05">
+		<label>Max Force: <span id="max-force-label"></span></label>
+		<input type="range" id="max-force" min="0" max="5" step="0.01" value="0.05">
 		
-		<label>Rayon de vision: <span id="vision-radius-label"></span></label>
+		<label>Vision Radius: <span id="vision-radius-label"></span></label>
 		<input type="range" id="vision-radius" min="0" max="100" value="40">
 		
-		<label>Rayon d'évitement: <span id="avoid-radius-label"></span></label>
+		<label>Avoidance Radius: <span id="avoid-radius-label"></span></label>
 		<input type="range" id="avoid-radius" min="0" max="100" value="30">
 		
-		<label>Seuil de Fatigue: <span id="max-fatigue-label"></span></label>
+		<label>Fatigue Threshold: <span id="max-fatigue-label"></span></label>
 		<input type="range" id="max-fatigue" min="0" max="20" step="0.1" value="6">
 		
-		<label>Facteur d'inattention: <span id="misconduct-label"></span></label>
+		<label>Chaos Factor: <span id="misconduct-label"></span></label>
 		<input type="range" id="misconduct" min="0" max="10" step="0.1" value="1">
 		
 		<div class="checkbox-container">
 			<input type="checkbox" id="color-cohesion-checkbox" />
-			<label for="color-cohesion-checkbox">Cohésion colorimétrique</label>
+			<label for="color-cohesion-checkbox">Color Cohesion</label>
 		</div>
 	</div>
 
 	<div id="readme-toggle">❓</div>
-	<div id="readme-window"></div>
+	<div id="readme-window">
+		<h3>About Bird-cloud</h3>
+		<p>This simulation is based on the <strong>Boids algorithm</strong>, mimicking the flocking behavior of birds.</p>
+		
+		<h4>The 3 Rules:</h4>
+		<ul>
+			<li><strong>Separation:</strong> Birds steer to avoid crowding local flockmates.</li>
+			<li><strong>Alignment:</strong> Birds steer towards the average heading of local flockmates.</li>
+			<li><strong>Cohesion:</strong> Birds steer to move towards the average position of local flockmates.</li>
+		</ul>
 
-	<a href="https://github.com/wartets/Bird-cloud/" target="_blank" id="wartets-link">@Wartets</a>
+		<h4>Controls:</h4>
+		<p>Click on a bird to track its path. Adjust the sliders in the settings (top right) to change the flock's physics.</p>
+	</div>
 
-	<script src="js\script.js"></script>
+	<a href="https://github.com/wartets/Bird-cloud/" target="_blank" rel="noopener noreferrer" id="wartets-link">@Wartets</a>
+
+	<script src="js/script.js"></script>
 </body>
 </html>

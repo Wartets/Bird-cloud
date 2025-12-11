@@ -3,14 +3,14 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let NUM_BIRDS = 300;
-let MAX_SPEED = 3;
-let MAX_FORCE = 0.05;
-let VISION_RADIUS = 40;
+let NUM_BIRDS = 2000;
+let MAX_SPEED = 20;
+let MAX_FORCE = 0.84;
+let VISION_RADIUS = 17;
 let AVOID_RADIUS = 30;
 let bird_color = false;
 let MAX_FATIGUE = 6;
-let MISCONDUCT = 1;
+let MISCONDUCT = 0.3;
 
 let cursorHidden = false;
 let inactivityTimeout;
@@ -19,7 +19,7 @@ let birds = [];
 let birdPaths = {};
 let currentBirdIndex = -1;
 
-const CAPACITY = 20000;
+const CAPACITY = 60000;
 let activeCount = NUM_BIRDS;
 
 const b_x = new Float32Array(CAPACITY);
@@ -60,6 +60,11 @@ colorCohesionCheckbox.addEventListener('change', () => {
 });
 
 let canClick = true;
+
+window.addEventListener('resize', () => {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+});
 
 canvas.addEventListener('click', (event) => {
 	if (!canClick) return;
@@ -105,18 +110,6 @@ controlsToggle.addEventListener('click', () => {
 const readmeButton = document.getElementById('readme-toggle');
 const readmeWindow = document.getElementById('readme-window');
 
-const readmeContent = `
-	<h2>Simulation de Nuée d'Oiseaux</h2>
-	<p>Ce projet est une simulation interactive basée sur le modèle des <strong>boids</strong>, illustrant le comportement collectif des oiseaux en vol. Il est basé sur trois règles de base :</p>
-	<ul>
-		<li><strong>Cohésion :</strong> Les oiseaux se rapprochent du centre de masse des voisins.</li>
-		<li><strong>Séparation :</strong> Ils évitent les collisions avec leurs congénères.</li>
-		<li><strong>Alignement :</strong> Ils suivent la direction moyenne des voisins.</li>
-	</ul>
-`;
-
-readmeWindow.innerHTML = readmeContent;
-
 readmeButton.addEventListener('click', () => {
 	readmeWindow.classList.toggle('show');
 });
@@ -136,7 +129,7 @@ canvas.addEventListener('mousemove', () => {
 		showCursor();
 	}
 	clearTimeout(inactivityTimeout);
-	inactivityTimeout = setTimeout(hideCursor, 3900);
+	inactivityTimeout = setTimeout(hideCursor, 5000);
 });
 
 numBirdsLabel.innerText = NUM_BIRDS;
@@ -157,10 +150,6 @@ numBirdsSlider.addEventListener('input', () => {
 		}
 	}
 	activeCount = newNum;
-	
-	if (spatialGrid.next.length < activeCount) {
-		spatialGrid.resize(activeCount + 5000);
-	}
 });
 
 maxSpeedSlider.addEventListener('input', () => {
@@ -202,7 +191,7 @@ class SpatialGrid {
 		this.rows = Math.ceil(height / cellSize);
 		this.numCells = this.cols * this.rows;
 		this.heads = new Int32Array(this.numCells);
-		this.next = new Int32Array(10000);
+		this.next = new Int32Array(CAPACITY);
 	}
 
 	resize(capacity) {
@@ -219,13 +208,20 @@ class SpatialGrid {
 		const col = (x / this.cellSize) | 0;
 		const row = (y / this.cellSize) | 0;
 		const cellIndex = row * this.cols + col;
-		
-		if (birdIndex >= this.next.length) {
-			this.resize(this.next.length * 2);
-		}
-
 		this.next[birdIndex] = this.heads[cellIndex];
 		this.heads[cellIndex] = birdIndex;
+	}
+	
+	setup(width, height, cellSize) {
+		this.width = width;
+		this.height = height;
+		this.cellSize = cellSize;
+		this.cols = Math.ceil(width / cellSize);
+		this.rows = Math.ceil(height / cellSize);
+		this.numCells = this.cols * this.rows;
+		if (this.heads.length < this.numCells) {
+			this.heads = new Int32Array(this.numCells);
+		}
 	}
 }
 
@@ -245,9 +241,7 @@ function initBird(i, x, y) {
 		c = Math.floor(Math.random() * 16777215);
 	}
 	
-	let hex = c.toString(16);
-	while (hex.length < 6) hex = '0' + hex;
-	b_colorStr[i] = '#' + hex;
+	b_colorStr[i] = '#' + c.toString(16).padStart(6, '0');
 
 	b_r[i] = (c >> 16) & 255;
 	b_g[i] = (c >> 8) & 255;
@@ -269,6 +263,7 @@ function updateFlock(spatialGrid) {
 	const maxForceSq = MAX_FORCE * MAX_FORCE;
 	const speedLimit = bird_color ? MAX_SPEED * 2 : MAX_SPEED;
 	const speedLimitSq = speedLimit * speedLimit;
+	const cellSz = spatialGrid.cellSize;
 
 	for (let i = 0; i < activeCount; i++) {
 		let alignX = 0, alignY = 0;
@@ -278,32 +273,30 @@ function updateFlock(spatialGrid) {
 
 		const myX = b_x[i];
 		const myY = b_y[i];
-		const myR = b_r[i];
-		const myG = b_g[i];
-		const myB = b_b[i];
 
-		const col = (myX / spatialGrid.cellSize) | 0;
-		const row = (myY / spatialGrid.cellSize) | 0;
+		const col = (myX / cellSz) | 0;
+		const row = (myY / cellSz) | 0;
 
 		for (let cy = -1; cy <= 1; cy++) {
 			let neighborRow = row + cy;
 			if (neighborRow < 0) neighborRow += gridRows;
 			else if (neighborRow >= gridRows) neighborRow -= gridRows;
+			const rowOffset = neighborRow * gridCols;
 
 			for (let cx = -1; cx <= 1; cx++) {
 				let neighborCol = col + cx;
 				if (neighborCol < 0) neighborCol += gridCols;
 				else if (neighborCol >= gridCols) neighborCol -= gridCols;
 
-				let otherIndex = spatialGrid.heads[neighborRow * gridCols + neighborCol];
+				let otherIndex = spatialGrid.heads[rowOffset + neighborCol];
 
 				while (otherIndex !== -1) {
 					if (otherIndex !== i) {
 						let isCompatible = true;
 						if (bird_color) {
-							const rDiff = myR - b_r[otherIndex];
-							const gDiff = myG - b_g[otherIndex];
-							const bDiff = myB - b_b[otherIndex];
+							const rDiff = b_r[i] - b_r[otherIndex];
+							const gDiff = b_g[i] - b_g[otherIndex];
+							const bDiff = b_b[i] - b_b[otherIndex];
 							if ((rDiff * rDiff + gDiff * gDiff + bDiff * bDiff) > 2500) isCompatible = false;
 						}
 
@@ -393,8 +386,9 @@ function updateFlock(spatialGrid) {
 		const vMagSq = b_vx[i] * b_vx[i] + b_vy[i] * b_vy[i];
 		if (vMagSq > speedLimitSq) {
 			const mag = Math.sqrt(vMagSq);
-			b_vx[i] = (b_vx[i] / mag) * speedLimit;
-			b_vy[i] = (b_vy[i] / mag) * speedLimit;
+			const mul = speedLimit / mag;
+			b_vx[i] *= mul;
+			b_vy[i] *= mul;
 		}
 
 		b_x[i] += b_vx[i];
@@ -407,7 +401,8 @@ function updateFlock(spatialGrid) {
 		if (b_y[i] >= h) b_y[i] = 0;
 		else if (b_y[i] < 0) b_y[i] = h;
 
-		b_fatigue[i] += Math.sqrt(vMagSq) * 0.01;
+		const speedVal = Math.sqrt(b_vx[i] * b_vx[i] + b_vy[i] * b_vy[i]);
+		b_fatigue[i] += speedVal * 0.01;
 		if (b_fatigue[i] > MAX_FATIGUE) {
 			b_vx[i] *= 0.95;
 			b_vy[i] *= 0.95;
@@ -419,35 +414,45 @@ function updateFlock(spatialGrid) {
 }
 
 function drawFlock() {
-	for (let i = 0; i < activeCount; i++) {
-		const vx = b_vx[i];
-		const vy = b_vy[i];
-		const magSq = vx * vx + vy * vy;
-		let cos = 1, sin = 0;
-		if (magSq > 0.001) {
-			const mag = Math.sqrt(magSq);
-			cos = vx / mag;
-			sin = vy / mag;
+	if (activeCount > 3000) {
+		for (let i = 0; i < activeCount; i++) {
+			ctx.fillStyle = b_colorStr[i];
+			ctx.fillRect(b_x[i], b_y[i], b_size[i] * 0.6, b_size[i] * 0.6);
 		}
-
-		const x = b_x[i];
-		const y = b_y[i];
-		const s = b_size[i];
-		const halfS = s * 0.5;
-
-		const headX = x + cos * s;
-		const headY = y + sin * s;
-		const sideX = -cos * s;
-		const sideY = -sin * s;
-		const perpX = sin * halfS;
-		const perpY = -cos * halfS;
-
-		ctx.fillStyle = b_colorStr[i];
-		ctx.beginPath();
-		ctx.moveTo(headX, headY);
-		ctx.lineTo(x + sideX + perpX, y + sideY + perpY);
-		ctx.lineTo(x + sideX - perpX, y + sideY - perpY);
-		ctx.fill();
+	} else {
+		for (let i = 0; i < activeCount; i++) {
+			const vx = b_vx[i];
+			const vy = b_vy[i];
+			const x = b_x[i];
+			const y = b_y[i];
+			const s = b_size[i];
+			
+			let cos = vx; 
+			let sin = vy;
+			const mag = Math.abs(vx) + Math.abs(vy); 
+			if (mag > 0.01) {
+				const inv = 1 / mag; 
+				cos *= inv;
+				sin *= inv;
+			} else {
+				cos = 1; sin = 0;
+			}
+	
+			const halfS = s * 0.5;
+			const headX = x + cos * s;
+			const headY = y + sin * s;
+			const sideX = -cos * s;
+			const sideY = -sin * s;
+			const perpX = sin * halfS;
+			const perpY = -cos * halfS;
+	
+			ctx.fillStyle = b_colorStr[i];
+			ctx.beginPath();
+			ctx.moveTo(headX, headY);
+			ctx.lineTo(x + sideX + perpX, y + sideY + perpY);
+			ctx.lineTo(x + sideX - perpX, y + sideY - perpY);
+			ctx.fill();
+		}
 	}
 }
 
@@ -483,10 +488,6 @@ function drawPaths() {
 	}
 }
 
-function dist(a, b) {
-	return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-}
-
 for (let i = 0; i < NUM_BIRDS; i++) {
 	initBird(i, Math.random() * canvas.width, Math.random() * canvas.height);
 }
@@ -503,7 +504,7 @@ function animate() {
 	if (spatialGrid.cellSize !== maxRadius || 
 		spatialGrid.width !== canvas.width || 
 		spatialGrid.height !== canvas.height) {
-		spatialGrid = new SpatialGrid(canvas.width, canvas.height, maxRadius);
+		spatialGrid.setup(canvas.width, canvas.height, maxRadius);
 	}
 
 	spatialGrid.clear();
