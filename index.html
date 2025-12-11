@@ -29,25 +29,28 @@
 	<div id="controls-window">
 		<h2>Settings</h2>
 		<label>Bird Count: <span id="num-birds-label"></span></label>
-		<input type="range" id="num-birds" min="1" max="5000" value="300">
+		<input type="range" id="num-birds">
 		
 		<label>Max Speed: <span id="max-speed-label"></span></label>
-		<input type="range" id="max-speed" min="0" max="100" step="0.1" value="3">
+		<input type="range" id="max-speed">
 		
 		<label>Max Force: <span id="max-force-label"></span></label>
-		<input type="range" id="max-force" min="0" max="5" step="0.01" value="0.05">
+		<input type="range" id="max-force">
 		
 		<label>Vision Radius: <span id="vision-radius-label"></span></label>
-		<input type="range" id="vision-radius" min="0" max="100" value="40">
+		<input type="range" id="vision-radius">
 		
 		<label>Avoidance Radius: <span id="avoid-radius-label"></span></label>
-		<input type="range" id="avoid-radius" min="0" max="100" value="30">
+		<input type="range" id="avoid-radius">
 		
 		<label>Fatigue Threshold: <span id="max-fatigue-label"></span></label>
-		<input type="range" id="max-fatigue" min="0" max="20" step="0.1" value="6">
+		<input type="range" id="max-fatigue">
 		
 		<label>Chaos Factor: <span id="misconduct-label"></span></label>
-		<input type="range" id="misconduct" min="0" max="10" step="0.1" value="1">
+		<input type="range" id="misconduct">
+		
+		<label>Predator Force: <span id="predator-force-label"></span></label>
+		<input type="range" id="predator-force">
 		
 		<div class="checkbox-container">
 			<input type="checkbox" id="color-cohesion-checkbox" />
@@ -67,8 +70,14 @@
 			<li><strong>Cohesion:</strong> Birds steer to move towards the average position of local flockmates.</li>
 		</ul>
 
+		<h4>Interaction:</h4>
+		<ul>
+			<li><strong>Predator:</strong> The mouse cursor acts as a predator. Birds will actively flee from it.</li>
+			<li><strong>Tracking:</strong> Click on a bird to visualize its individual path.</li>
+		</ul>
+
 		<h4>Controls:</h4>
-		<p>Click on a bird to track its path. Adjust the sliders in the settings (top right) to change the flock's physics.</p>
+		<p>Adjust the sliders in the settings (top right) to change the flock's physics.</p>
 	</div>
 
 	<a href="https://github.com/wartets/Bird-cloud/" target="_blank" rel="noopener noreferrer" id="wartets-link">@Wartets</a>

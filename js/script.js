@@ -3,19 +3,33 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let NUM_BIRDS = 2000;
-let MAX_SPEED = 20;
-let MAX_FORCE = 0.84;
-let VISION_RADIUS = 17;
-let AVOID_RADIUS = 30;
+const settings = {
+	numBirds: { val: 2000, min: 1, max: 5000, step: 1, id: 'num-birds', label: 'num-birds-label' },
+	maxSpeed: { val: 20, min: 0, max: 100, step: 0.1, id: 'max-speed', label: 'max-speed-label' },
+	maxForce: { val: 0.84, min: 0, max: 5, step: 0.01, id: 'max-force', label: 'max-force-label' },
+	visionRadius: { val: 17, min: 0, max: 100, step: 1, id: 'vision-radius', label: 'vision-radius-label' },
+	avoidRadius: { val: 30, min: 0, max: 100, step: 1, id: 'avoid-radius', label: 'avoid-radius-label' },
+	maxFatigue: { val: 6, min: 0, max: 20, step: 0.1, id: 'max-fatigue', label: 'max-fatigue-label' },
+	misconduct: { val: 0.3, min: 0, max: 10, step: 0.1, id: 'misconduct', label: 'misconduct-label' },
+	predatorForce: { val: 0, min: 0, max: 20, step: 0.01, id: 'predator-force', label: 'predator-force-label' }
+};
+
+let NUM_BIRDS = settings.numBirds.val;
+let MAX_SPEED = settings.maxSpeed.val;
+let MAX_FORCE = settings.maxForce.val;
+let VISION_RADIUS = settings.visionRadius.val;
+let AVOID_RADIUS = settings.avoidRadius.val;
 let bird_color = false;
-let MAX_FATIGUE = 6;
-let MISCONDUCT = 0.3;
+let MAX_FATIGUE = settings.maxFatigue.val;
+let MISCONDUCT = settings.misconduct.val;
+let PREDATOR_FORCE = settings.predatorForce.val;
 
 let cursorHidden = false;
 let inactivityTimeout;
+let mouseX = 0;
+let mouseY = 0;
 
-let birds = []; 
+let birds = [];
 let birdPaths = {};
 let currentBirdIndex = -1;
 
@@ -38,25 +52,61 @@ const b_colorStr = new Array(CAPACITY);
 
 const controlsToggle = document.getElementById('controls-toggle');
 const controlsWindow = document.getElementById('controls-window');
-const numBirdsSlider = document.getElementById('num-birds');
-const maxSpeedSlider = document.getElementById('max-speed');
-const maxForceSlider = document.getElementById('max-force');
-const visionRadiusSlider = document.getElementById('vision-radius');
-const avoidRadiusSlider = document.getElementById('avoid-radius');
-const maxFatigueSlider = document.getElementById('max-fatigue');
-const misconductSlider = document.getElementById('misconduct');
-
-const numBirdsLabel = document.getElementById('num-birds-label');
-const maxSpeedLabel = document.getElementById('max-speed-label');
-const maxForceLabel = document.getElementById('max-force-label');
-const visionRadiusLabel = document.getElementById('vision-radius-label');
-const avoidRadiusLabel = document.getElementById('avoid-radius-label');
-const maxFatigueLabel = document.getElementById('max-fatigue-label');
-const misconductLabel = document.getElementById('misconduct-label');
-
 const colorCohesionCheckbox = document.getElementById('color-cohesion-checkbox');
+
+function initSlider(key, callback) {
+	const config = settings[key];
+	const slider = document.getElementById(config.id);
+	const label = document.getElementById(config.label);
+
+	slider.min = config.min;
+	slider.max = config.max;
+	slider.step = config.step;
+	slider.value = config.val;
+
+	const updateLabel = (val) => {
+		if (config.step >= 1) {
+			label.innerText = Math.round(val);
+		} else {
+			label.innerText = parseFloat(val).toFixed(config.step < 0.1 ? 2 : 1);
+		}
+	};
+
+	updateLabel(config.val);
+
+	slider.addEventListener('input', () => {
+		const val = parseFloat(slider.value);
+		updateLabel(val);
+		callback(val);
+	});
+}
+
+initSlider('numBirds', (val) => {
+	const newNum = parseInt(val, 10);
+	NUM_BIRDS = newNum;
+	if (newNum > activeCount) {
+		for (let i = activeCount; i < newNum; i++) {
+			initBird(i, Math.random() * canvas.width, Math.random() * canvas.height);
+		}
+	}
+	activeCount = newNum;
+});
+
+initSlider('maxSpeed', (val) => MAX_SPEED = val);
+initSlider('maxForce', (val) => MAX_FORCE = val);
+initSlider('visionRadius', (val) => VISION_RADIUS = parseInt(val, 10));
+initSlider('avoidRadius', (val) => AVOID_RADIUS = parseInt(val, 10));
+initSlider('maxFatigue', (val) => MAX_FATIGUE = val);
+initSlider('misconduct', (val) => MISCONDUCT = val);
+initSlider('predatorForce', (val) => PREDATOR_FORCE = val);
+
+colorCohesionCheckbox.checked = bird_color;
 colorCohesionCheckbox.addEventListener('change', () => {
 	bird_color = colorCohesionCheckbox.checked;
+});
+
+controlsToggle.addEventListener('click', () => {
+	controlsWindow.classList.toggle('show');
 });
 
 let canClick = true;
@@ -103,10 +153,6 @@ canvas.addEventListener('click', (event) => {
 	}
 });
 
-controlsToggle.addEventListener('click', () => {
-	controlsWindow.classList.toggle('show');
-});
-
 const readmeButton = document.getElementById('readme-toggle');
 const readmeWindow = document.getElementById('readme-window');
 
@@ -124,62 +170,14 @@ function showCursor() {
 	cursorHidden = false;
 }
 
-canvas.addEventListener('mousemove', () => {
+canvas.addEventListener('mousemove', (e) => {
+	mouseX = e.clientX;
+	mouseY = e.clientY;
 	if (cursorHidden) {
 		showCursor();
 	}
 	clearTimeout(inactivityTimeout);
 	inactivityTimeout = setTimeout(hideCursor, 5000);
-});
-
-numBirdsLabel.innerText = NUM_BIRDS;
-maxSpeedLabel.innerText = MAX_SPEED;
-maxForceLabel.innerText = MAX_FORCE;
-visionRadiusLabel.innerText = VISION_RADIUS;
-avoidRadiusLabel.innerText = AVOID_RADIUS;
-maxFatigueLabel.innerText = MAX_FATIGUE;
-misconductLabel.innerText = MISCONDUCT;
-
-numBirdsSlider.addEventListener('input', () => {
-	const newNum = parseInt(numBirdsSlider.value, 10);
-	numBirdsLabel.innerText = newNum;
-
-	if (newNum > activeCount) {
-		for (let i = activeCount; i < newNum; i++) {
-			initBird(i, Math.random() * canvas.width, Math.random() * canvas.height);
-		}
-	}
-	activeCount = newNum;
-});
-
-maxSpeedSlider.addEventListener('input', () => {
-	MAX_SPEED = parseFloat(maxSpeedSlider.value);
-	maxSpeedLabel.innerText = MAX_SPEED.toFixed(1);
-});
-
-maxForceSlider.addEventListener('input', () => {
-	MAX_FORCE = parseFloat(maxForceSlider.value);
-	maxForceLabel.innerText = MAX_FORCE.toFixed(2);
-});
-
-visionRadiusSlider.addEventListener('input', () => {
-	VISION_RADIUS = parseInt(visionRadiusSlider.value, 10);
-	visionRadiusLabel.innerText = VISION_RADIUS;
-});
-
-avoidRadiusSlider.addEventListener('input', () => {
-	AVOID_RADIUS = parseInt(avoidRadiusSlider.value, 10);
-	avoidRadiusLabel.innerText = AVOID_RADIUS;
-});
-
-maxFatigueSlider.addEventListener('input', () => {
-	MAX_FATIGUE = parseFloat(maxFatigueSlider.value);
-	maxFatigueLabel.innerText = MAX_FATIGUE.toFixed(1);
-});
-
-misconductSlider.addEventListener('input', () => {
-	MISCONDUCT = parseFloat(misconductSlider.value);
-	misconductLabel.innerText = MISCONDUCT.toFixed(2);
 });
 
 class SpatialGrid {
@@ -264,6 +262,7 @@ function updateFlock(spatialGrid) {
 	const speedLimit = bird_color ? MAX_SPEED * 2 : MAX_SPEED;
 	const speedLimitSq = speedLimit * speedLimit;
 	const cellSz = spatialGrid.cellSize;
+	const predatorRangeSq = 200 * 200;
 
 	for (let i = 0; i < activeCount; i++) {
 		let alignX = 0, alignY = 0;
@@ -273,6 +272,19 @@ function updateFlock(spatialGrid) {
 
 		const myX = b_x[i];
 		const myY = b_y[i];
+
+		if (!cursorHidden && PREDATOR_FORCE > 0) {
+			const dx = myX - mouseX;
+			const dy = myY - mouseY;
+			const dSq = dx * dx + dy * dy;
+			
+			if (dSq < predatorRangeSq) {
+				const d = Math.sqrt(dSq);
+				const force = (1 / (d + 1)) * PREDATOR_FORCE;
+				b_ax[i] += (dx / d) * force;
+				b_ay[i] += (dy / d) * force;
+			}
+		}
 
 		const col = (myX / cellSz) | 0;
 		const row = (myY / cellSz) | 0;
@@ -429,7 +441,7 @@ function drawFlock() {
 			
 			let cos = vx; 
 			let sin = vy;
-			const mag = Math.abs(vx) + Math.abs(vy); 
+			const mag = Math.sqrt(vx * vx + vy * vy); 
 			if (mag > 0.01) {
 				const inv = 1 / mag; 
 				cos *= inv;
@@ -438,9 +450,10 @@ function drawFlock() {
 				cos = 1; sin = 0;
 			}
 	
+			const stretch = 1 + (mag / MAX_SPEED);
 			const halfS = s * 0.5;
-			const headX = x + cos * s;
-			const headY = y + sin * s;
+			const headX = x + cos * s * stretch;
+			const headY = y + sin * s * stretch;
 			const sideX = -cos * s;
 			const sideY = -sin * s;
 			const perpX = sin * halfS;
