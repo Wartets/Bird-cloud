@@ -1,0 +1,166 @@
+canvas {
+	background-color: #000;
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+}
+body {
+	margin: 0;
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+	font-family: 'Arial', sans-serif;
+	font-size: 14px;
+	color: #fff;
+}
+
+#controls-toggle {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	background: #333;
+	color: #fff;
+	border-radius: 5px;
+	padding: 10px;
+	cursor: pointer;
+	z-index: 1000;
+	opacity: 0.5;
+	transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#controls-toggle:hover {
+	opacity: 1;
+	background: #444;
+	transform: scale(1.1);
+}
+
+#controls-window {
+	position: fixed;
+	top: 10px;
+	right: 60px;
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	padding: 20px;
+	border-radius: 10px;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.3s ease, visibility 0s 0.3s;
+	z-index: 1000;
+}
+
+#controls-window.show {
+	visibility: visible;
+	opacity: 1;
+	transition: opacity 0.3s ease, visibility 0s 0s;
+}
+
+#controls-window,
+#controls-toggle,
+#readme-window,
+#readme-toggle {
+	user-select: none;
+}
+
+input[type="range"] {
+	cursor: pointer;
+}
+
+input[type="range"]:hover {
+	cursor: ew-resize;
+}
+
+input[type="checkbox"] {
+	cursor: pointer;
+}
+
+#controls-window label {
+	display: block;
+	margin: 10px 0 5px;
+}
+
+#controls-window input[type="range"] {
+	width: 100%;
+}
+
+#controls-window h2 {
+	margin-top: 0;
+}
+
+.checkbox-container {
+	display: flex;
+	align-items: center;
+}
+
+.checkbox-container input[type="checkbox"] {
+	margin-right: 10px;
+}
+
+#wartets-link {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	color: #ffffff;
+	background-color: none;
+	padding: 10px;
+	border-radius: 5px;
+	font-size: 14px;
+	opacity: 0.7;
+	transition: color 0.3s ease, opacity 0.3s ease, text-decoration 0.3s ease;
+}
+
+#wartets-link:hover {
+	left: 7px;
+	top: 8px;
+	color: #eee;
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: 15px;
+	opacity: 1;
+	transition: color 0.3s ease, opacity 0.1s ease, text-decoration 0.3s ease;
+}
+
+#readme-toggle {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	background: #333;
+	color: #fff;
+	border-radius: 5px;
+	padding: 10px;
+	cursor: pointer;
+	z-index: 1000;
+	opacity: 0.5;
+	transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#readme-toggle:hover {
+	background: #444;
+	transform: scale(1.1);
+	opacity: 1;
+}
+
+#readme-window {
+	position: fixed;
+	bottom: 60px;
+	right: 10px;
+	background: rgba(0, 0, 0, 0.9);
+	color: #fff;
+	padding: 20px;
+	border-radius: 10px;
+	width: 400px;
+	max-height: 70vh;
+	overflow-y: auto;
+	visibility: hidden;
+	opacity: 0;
+	transition: opacity 0.3s ease, visibility 0s 0.3s;
+	z-index: 1000;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+#readme-window.show {
+	visibility: visible;
+	opacity: 1;
+	transition: opacity 0.3s ease, visibility 0s 0s;
+}
