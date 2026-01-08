@@ -1,58 +1,56 @@
-# Simulation de Nuée d'Oiseaux
+# Bird Flock Simulation
 
-Une simulation interactive illustrant le comportement collectif des oiseaux en vol, basée sur le modèle des boids.
+An interactive simulation illustrating the collective flight behavior of birds, based on the boids model.
 
-## 🛠 Fonctionnalités principales
+## Main Features
 
-1. **Simulation en Canvas HTML5** :
-   - Les oiseaux sont représentés par des triangles animés.
-   - Comportements basés sur 3 règles fondamentales :
-     - **Cohésion** : Se rapprocher du centre de masse des voisins.
-     - **Séparation** : Éviter les collisions avec les autres oiseaux.
-     - **Alignement** : Suivre la direction moyenne des voisins.
+1. **HTML5 Canvas Simulation**:
+   - Birds are represented by animated triangles.
+   - Behaviors are based on 3 fundamental rules:
+     - **Cohesion**: Moving toward the center of mass of neighbors.
+     - **Separation**: Avoiding collisions with other birds.
+     - **Alignment**: Matching the average direction of neighbors.
 
-2. **Facteur de fatigue** :
-   - Les oiseaux ralentissent après un vol prolongé, simulant la fatigue, et reprennent progressivement leur vitesse.
+2. **Fatigue Factor**:
+   - Birds slow down after prolonged flight, simulating fatigue, and gradually regain speed.
 
-3. **Comportement aléatoire** :
-   - Certains oiseaux adoptent un comportement erratique temporaire.
+3. **Random Behavior**:
+   - Some birds adopt temporary erratic behavior.
 
-4. **Panneau de contrôle interactif** :
-   - Ajustez les paramètres de simulation en temps réel grâce à un panneau de configuration (accessible via un bouton ⚙️) :
-     - Nombre d'oiseaux.
-     - Vitesse maximale.
-     - Force maximale.
-     - Rayon de vision.
-     - Rayon d'évitement.
-     - Niveau de fatigue maximum.
-     - Facteur d'imprévisibilité.
+4. **Interactive Control Panel**:
+   - Adjust simulation parameters in real-time via a configuration panel (accessible via a gear button):
+     - Number of birds.
+     - Maximum speed.
+     - Maximum force.
+     - Vision radius.
+     - Avoidance radius.
+     - Maximum fatigue level.
+     - Unpredictability factor.
 
-5. **Suivi des trajectoires** :
-   - Cliquez sur un oiseau pour afficher/effacer sa trajectoire dans la simulation.
+5. **Trajectory Tracking**:
+   - Click on a bird to toggle its flight path display within the simulation.
 
-6. **Personnalisation des couleurs** :
-   - Activez la différenciation par couleurs pour observer des groupes d’oiseaux similaires.
+6. **Color Customization**:
+   - Enable color differentiation to observe groups of similar birds.
 
-## 🚀 Instructions
+## Instructions
 
-1. Clonez ou téléchargez le projet et ouvrez `index.html` dans votre navigateur préféré. Ou sinon accèdez aux site [internet](https://wartets.github.io/Bird-cloud/).
-2. Cliquez sur l'icône ⚙️ pour ouvrir le panneau de configuration.
-3. Ajustez les paramètres pour découvrir les différents comportements de la nuée.
+1. Clone or download the project and open `index.html` in your preferred browser. Alternatively, access the [website](https://wartets.github.io/Bird-cloud/).
+2. Click on the gear icon to open the configuration panel.
+3. Adjust the parameters to discover different flock behaviors.
 
-## 🛠 Technologies utilisées
+## Technologies Used
 
-- **HTML5** : Pour le canvas et la structure générale.
-- **CSS3** : Pour le style de l'interface utilisateur.
-- **JavaScript (ES6)** : Pour la simulation et les interactions utilisateur.
+- **HTML5**: For the canvas and general structure.
+- **CSS3**: For the user interface styling.
+- **JavaScript (ES6)**: For the simulation and user interactions.
 
-## 📖 Explication des paramètres
+## Parameter Explanation
 
-- **Nombre d'oiseaux** : Contrôle le nombre total d'oiseaux dans la simulation.
-- **Vitesse maximale** : Limite la vitesse de déplacement des oiseaux.
-- **Force maximale** : Détermine l’intensité des ajustements de direction.
-- **Rayon de vision** : Portée dans laquelle un oiseau détecte ses voisins.
-- **Rayon d'évitement** : Distance minimale pour éviter les collisions.
-- **Fatigue maximale** : Influence la capacité des oiseaux à maintenir leur vitesse.
-- **Imprévisibilité** : Ajoute un comportement aléatoire à certains oiseaux.
-
----
+- **Number of birds**: Controls the total number of birds in the simulation.
+- **Maximum speed**: Limits the flight speed of the birds.
+- **Maximum force**: Determines the intensity of direction adjustments.
+- **Vision radius**: Range within which a bird detects its neighbors.
+- **Avoidance radius**: Minimum distance to avoid collisions.
+- **Maximum fatigue**: Influences the birds' ability to maintain speed.
+- **Unpredictability**: Adds random behavior to certain birds.
